@@ -26,24 +26,29 @@ const onGalleryListItemClick = event => {
   if (!event.target.classList.contains('gallery__image')) {
     return;
   }
-  const originalImage = basicLightbox.create(`
-  <img src="${event.target.dataset.source}">
-  `);
+
+  const originalImage = basicLightbox.create(
+    `
+    <img src="${event.target.dataset.source}">
+    `,
+    {
+      onShow() {
+        document.addEventListener('keydown', onButtonPush);
+      },
+      onClose() {
+        document.removeEventListener('keydown', onButtonPush);
+      },
+    }
+  );
 
   originalImage.show();
 
-  modalEscapeClosure(originalImage);
-};
-
-function modalEscapeClosure(modal) {
-  const onButtonPush = event => {
+  function onButtonPush(event) {
     if (event.code !== 'Escape') {
       return;
     }
-    modal.close();
-    document.removeEventListener('keydown', onButtonPush);
-  };
-  document.addEventListener('keydown', onButtonPush);
-}
+    originalImage.close();
+  }
+};
 
 galleryListElement.addEventListener('click', onGalleryListItemClick);
